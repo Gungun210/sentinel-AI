@@ -2,6 +2,10 @@
 
 A world-class, enterprise-grade AI observability platform for modern engineering teams. Monitor logs, analyze incidents, detect anomalies, and identify probable root causes with AI.
 
+## 🌐 Live Demo
+
+Live Application: https://sentinel-ai-sandy-three.vercel.app/
+
 ## 🚀 Features
 
 ### Core Capabilities
