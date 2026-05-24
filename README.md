@@ -312,9 +312,6 @@ MIT License - see LICENSE file for details
 - Icons by Lucide
 - UI components by ShadCN
 
-## 📞 Support
-
-For support, email support@sentinel-ai.com or open an issue on GitHub.
 
 ---
 
