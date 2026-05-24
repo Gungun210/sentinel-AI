@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  incidents     Incident[]
+  alerts        Alert[]
+}
+
+model Incident {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  severity        Severity
+  status          Status
+  timestamp       DateTime  @default(now())
+  service         String
+  rootCause       String?
+  confidence      Float
+  affectedServices String[]
+  metrics         Json
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  timelineEvents  TimelineEvent[]
+  recommendations Recommendation[]
+}
+
+model Service {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  status      ServiceStatus
+  cpu         Float
+  memory      Float
+  latency     Float
+  errorRate   Float
+  uptime      Float
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  metrics     Metric[]
+  alerts      Alert[]
+  predictions Prediction[]
+}
+
+model Metric {
+  id          String   @id @default(cuid())
+  timestamp   DateTime @default(now())
+  value       Float
+  label       String
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  type        String
+  severity    Severity
+  message     String
+  timestamp   DateTime @default(now())
+  resolved    Boolean  @default(false)
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Prediction {
+  id             String   @id @default(cuid())
+  service        String
+  type           String
+  probability    Float
+  timeframe      String
+  recommendation String
+  serviceId      String
+  service        Service  @relation(fields: [serviceId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+model TimelineEvent {
+  id          String    @id @default(cuid())
+  timestamp   DateTime  @default(now())
+  event       String
+  severity    Severity
+  details     String
+  incidentId  String
+  incident    Incident  @relation(fields: [incidentId], references: [id])
+}
+
+model Recommendation {
+  id          String    @id @default(cuid())
+  action      String
+  priority    Int
+  status      String    @default("pending")
+  incidentId  String
+  incident    Incident  @relation(fields: [incidentId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model LogEntry {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  level     LogLevel
+  service   String
+  message   String
+  metadata  Json?
+}
+
+enum Severity {
+  critical
+  high
+  medium
+  low
+}
+
+enum Status {
+  active
+  investigating
+  resolved
+  closed
+}
+
+enum ServiceStatus {
+  healthy
+  degraded
+  down
+}
+
+enum LogLevel {
+  info
+  warn
+  error
+  debug
+}
